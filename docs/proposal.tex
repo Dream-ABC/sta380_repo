@@ -1,0 +1,81 @@
+\documentclass{article}
+\usepackage{enumitem}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{titling}
+
+\setlength{\droptitle}{-2cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\title{
+    \textbf{\fontsize{16}{19.2}\selectfont STA380 Project Proposal}\\[1em]
+    \fontsize{11}{13.2}\selectfont High-Dimensional Feature Selection via Permutation Test and Bootstrap Stability Analysis
+}
+\author{
+    \fontsize{11}{13.2}\selectfont
+    Renfei Wu, Shiqi Tian, Chengxi Li, Liwen Yin \\
+    \fontsize{11}{13.2}\selectfont
+    Team Chou Why Did \\
+    \fontsize{11}{13.2}\selectfont
+    STA380H5, 2026 \\
+    \fontsize{11}{13.2}\selectfont
+    University of Toronto Mississauga
+}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{1. Project Topic}
+This project focuses on understanding how different statistical methods behave when the signal strength and distributional assumptions vary. Users will interactive exploration of feature relevance using permutation testing and bootstrap resampling under controlled data-generating processes.
+
+\section*{2. Simulation vs. Dataset}
+The project will rely on simulated datasets.
+
+\section*{3. Project Details}
+Data will be generated starting from samples drawn from a uniform distribution. For each feature, the data-generating process follows a mixture model:
+$$z(y) = \alpha \cdot g(y) + (1 - \alpha) \cdot h(y)$$
+Where:
+\begin{itemize}[itemsep=0pt, parsep=0pt, topsep=0pt]
+    \item $\alpha$: Feature strength (signal level).
+    \item $g(y)$: Distribution whose mean depends on the true label y and represents the informative signal.
+    \item $h(y)$: Noise distribution with mean differs from y and represents irrelevant variation.
+\end{itemize}
+
+Also, users will be able to select different distributions for both g and h to investigate how assumptions about data generation influence statistical inference. But the parameter will be generated randomly. So the program know the correct relative features but user do not know.
+
+Feature relevance will be evaluated using permutation testing:
+\begin{itemize}[itemsep=0pt, parsep=0pt, topsep=0pt]
+    \item Users may choose among several test statistics.
+    \item A null distribution will be constructed by repeatedly permuting the labels.
+    \item p-values will be computed based on the permutation distribution.
+\end{itemize}
+
+Bootstrap resampling will be used to study the stability of feature estimates:
+\begin{itemize}[itemsep=0pt, parsep=0pt, topsep=0pt]
+    \item Users may select descriptive statistics.
+    \item Bootstrap samples will be used to estimate variability and assess robustness across repeated resampling.
+\end{itemize}
+
+The overall goal is to allow users to explore how permutation tests and bootstrap methods respond to different data structures, including varying signal strength, distribution shapes, and noise levels.
+
+\section*{4. User Inputs (Shiny Components)}
+Users will be able to modify the following:
+\begin{enumerate}[itemsep=0pt, parsep=0pt, topsep=0pt]
+    \item Choice of distributions for $g(y)$ and $h(y)$.
+    \item Sample size and number of features.
+    \item Selection of permutation test statistic (mean difference, Kolmogorov–Smirnov statistic, or Cramér–von Mises statistic).
+    \item Selection of bootstrap descriptive statistics (mean, median, standard error, bias).
+    \item Number of bootstrap resamples.
+    \item Visualization options and plot parameters.
+\end{enumerate}
+
+\section*{5. Reference} 
+\begin{itemize} [itemsep=0pt, parsep=0pt, topsep=0pt]
+    \item R
+    \item R Shiny
+    \item Anny Ly, University of Toronto Mississauga STA380H5 lecture notes, 2026
+\end{itemize}
+
+\end{document}
