@@ -1,15 +1,19 @@
 \documentclass{article}
 \usepackage{enumitem}
-\usepackage[margin=1.2in]{geometry}
+\usepackage[margin=1in]{geometry}
 \usepackage{titling}
 \usepackage{amsmath}
+\usepackage{titlesec}
 
 \setlength{\droptitle}{-2cm}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
+\setlength{\parskip}{4pt}
+
+
+\titlespacing*{\section}{0pt}{12pt}{4pt}
 
 \title{
-    \textbf{\fontsize{16}{19.2}\selectfont STA380 Project Proposal}\\[1em]
+    \textbf{\fontsize{16}{19.2}\selectfont STA380 Project Proposal}\\[0.5em]
     \fontsize{11}{13.2}\selectfont High-Dimensional Feature Selection via Permutation Test and Bootstrap Stability Analysis
 }
 \author{
@@ -93,6 +97,8 @@ Users will be able to modify the following:
 \nocite{*}
 \bibliographystyle{abbrvnat}
 \bibliography{bibliography}
-\vspace{0.8cm}
+
+\section*{Statement on Generative AI Usage}
+We did not use generative AI tools in this proposal. All content, including the mathematical formulation, project design, and writing, was completed independently by the team members.
 
 \end{document}
