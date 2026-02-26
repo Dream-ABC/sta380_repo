@@ -14,7 +14,13 @@ File → New Project → Existing Directory → select this repo.
 
 Install required packages in your R console:
 ```r
-install.packages(c("testthat", "roxygen2", "rmarkdown", "devtools"))
+install.packages(c("testthat", "roxygen2", "rmarkdown"))
+```
+
+To render the vignette to PDF, install the following package in your R console:
+```r
+install.packages("tinytex")
+tinytex::install_tinytex()
 ```
 
 ## Testing
