@@ -30,18 +30,13 @@ testthat::test_dir("R/tests/testthat")
 
 ## Render Docs
 
-- Render R Code's roxygen documentation  
-  Run in your terminal:
-  ```bash
-  R -e 'roxygen2::roxygenise()'
-  ```
-  Or run in your R console:
-  ```r
-  roxygen2::roxygenise()
-  ```
+To render R Code's roxygen documentation, run in your terminal:
+```bash
+R -e 'roxygen2::roxygenise()'
+```
 
-- Render Rmd vignette for R code
-  In your terminal:
-  ```bash
-  Rscript -e "rmarkdown::render('docs/vignette.Rmd')"
-  ```
+To render Rmd vignette for R code
+In your terminal:
+```bash
+Rscript -e "rmarkdown::render('docs/vignette.Rmd')"
+```

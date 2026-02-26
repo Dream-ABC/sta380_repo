@@ -1,8 +1,8 @@
 Package: sta380project
-Title: High-Dimensional Feature Selection via Permutation and Bootstrap
+Title: High-Dimensional Feature Selection via Permutation Test
 Version: 0.1.0
 Authors@R: person("Team", "Chou Why Did", email = "", role = c("aut", "cre"))
-Description: Permutation testing and bootstrap stability analysis for feature selection on simulated mixture data (STA380 project).
+Description: Permutation testing for feature selection on simulated mixture data (STA380 project).
 License: MIT
 Encoding: UTF-8
 Depends: R (>= 4.0.0)

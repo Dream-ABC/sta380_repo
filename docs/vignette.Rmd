@@ -2,7 +2,7 @@
 title: "Basic R Implementation Vignette"
 author: "Team Chou Why Did: Renfei Wu, Shiqi Tian, Chengxi Li, Liwen Yin"
 output: pdf_document
-bibliography: docs/bibliography.bib
+bibliography: bibliography.bib
 nocite: "@*"
 ---
 
@@ -19,20 +19,18 @@ knitr::opts_chunk$set(
 )
 source("../R/data_simulation.R")
 source("../R/permutation_test.R")
-source("../R/bootstrap_stability.R")
 source("../R/evaluation.R")
 ```
 
 ## 0. Introduction
 
-The project contain 4 R files: 
+The project contain 3 R files: 
 
 1. `data_simulation.R`
 2. `permutation_test.R`
-3. `bootstrap_stability.R`
-4. `evaluation.R`
+3. `evaluation.R`
 
-To run the entire project, execute each class in the order described above. The first R script is used to generate sample data. The second and third R scripts allow users to choose hyperparameters and perform statistical tests to identify important features. The final script evaluates the accuracy of their self-defined statistical method, for example by measuring how successfully it identifies the correct features.
+To run the entire project, execute each class in the order described above. The first R script is used to generate sample data. The second script allows users to choose hyperparameters and perform permutation tests to identify important features. The final script evaluates the accuracy of their self-defined statistical method, for example by measuring how successfully it identifies the correct features.
 
 ## 1. Data Simulation
 
@@ -260,84 +258,7 @@ shown in red.
 
 
 
-## 3. Bootstrap Stability
-
-### (1) `bootstrap_selection_frequency()`
-
-A single permutation test can vary depending on the sample. This
-function runs the feature selection procedure across $B$ bootstrap
-resamples and records how often each feature is selected. A higher
-frequency indicates a more stable and reliable feature [@efron1994introduction].
-
-```{r}
-selector <- function(X, Y) {
-  select_features_permutation(X, Y,
-                              stat_fun    = stat_mean_diff,
-                              n_shuffles  = 99,
-                              alpha_level = 0.05)
-}
-
-set.seed(380)
-freq <- bootstrap_selection_frequency(
-  sim$X, sim$Y,
-  select_fun = selector,
-  B          = 50,
-  seed       = 380
-)
-
-length(freq)
-round(freq, 2)
-```
-Features in the true signal set tend to have higher selection
-frequencies than noise features.
-
-
-### (2) `select_features_bootstrap()`
-
-This function selects features whose bootstrap selection frequency
-is at or above a `threshold`. Only features that are consistently
-selected across bootstrap resamples are retained, making the
-selection more stable. It also returns the full frequency vector
-as an attribute.
-
-Notice, the inputs has the following constrain:
-
-- `threshold` should be in range \( [0, 1] \). Larger values mean stricter selection.
-- `B` trades off stability vs runtime (more bootstraps = slower, smoother frequencies).
-
-```{r}
-set.seed(380)
-selected_boot <- select_features_bootstrap(
-  sim$X, sim$Y,
-  select_fun = selector,
-  B          = 50,
-  threshold  = 0.5,
-  seed       = 380
-)
-
-selected_boot
-attr(selected_boot, "frequency")[selected_boot]
-
-barplot(attr(selected_boot, "frequency"),
-        names.arg = 1:50,
-        col       = ifelse(1:50 %in% sim$S, "salmon", "lightblue"),
-        xlab      = "Feature index",
-        ylab      = "Selection frequency",
-        main      = "Bootstrap selection frequency",
-        las       = 2,
-        cex.names = 0.6)
-abline(h = 0.5, lty = 2)
-legend("topright",
-       legend = c("True signal", "Null"),
-       fill   = c("salmon", "lightblue"),
-       inset   = 0.08,
-       cex     = 0.85)
-```
-
-`r length(selected_boot)` features above the dashed line are selected. True signal features
-are shown in red.
-
-## 4. Evaluation
+## 3. Evaluation
 
 ### (1) `evaluate_precision_recall()`
 
@@ -346,39 +267,17 @@ relevant set **S**. Precision measures how many selected features
 are truly relevant. Recall measures how many true relevant features
 were found.
 
-In this section, we evaluate both the direct permutation selection and the
-bootstrap-stabilized selection, then visualize the trade-off.
+We evaluate the permutation-based selection below.
 
 ```{r}
 pr_perm <- evaluate_precision_recall(S_truth = sim$S, S_hat = selected_perm)
-pr_boot <- evaluate_precision_recall(S_truth = sim$S, S_hat = selected_boot)
 
 pr_perm$precision
 pr_perm$recall
-pr_boot$precision
-pr_boot$recall
 ```
 
 A higher precision means fewer false positives were selected. 
 A higher recall means more true relevant features were found.
-
-We can also compare both methods in a single plot:
-
-```{r}
-mat <- rbind(
-  permutation = c(precision = pr_perm$precision, recall = pr_perm$recall),
-  bootstrap   = c(precision = pr_boot$precision, recall = pr_boot$recall)
-)
-barplot(
-  t(mat),
-  beside = TRUE,
-  col = c("#6699FF", "#05DEB2"),
-  ylim = c(0, 1),
-  ylab = "Score",
-  main = "Precision/Recall comparison"
-)
-legend("topright", legend = colnames(mat), fill = c("#6699FF", "#05DEB2"))
-```
 
 ### (2) `f1_score()`
 
@@ -388,9 +287,7 @@ Both must be high for a good F1 score [@voss2013introduction].
 $$F1 = \frac{2 \times \text{precision} \times \text{recall}}{\text{precision} + \text{recall}}$$
 ```{r}
 f1_perm <- f1_score(pr_perm$precision, pr_perm$recall)
-f1_boot <- f1_score(pr_boot$precision, pr_boot$recall)
 f1_perm
-f1_boot
 ```
 
 An F1 score closer to 1 indicates better overall feature selection
