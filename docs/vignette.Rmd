@@ -1,6 +1,6 @@
 ---
 title: "Basic R Implementation Vignette"
-author: "Team Chou Why Did: Renfei Wu, Shiqi Tian, Chengxi Li, Liwen Yin"
+author: "Team Chow Why Did: Renfei Wu, Shiqi Tian, Chengxi Li, Liwen Yin"
 output: pdf_document
 bibliography: bibliography.bib
 nocite: "@*"
