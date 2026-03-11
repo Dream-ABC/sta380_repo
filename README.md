@@ -1,5 +1,5 @@
 ## sta380_repo
-Private repo for 2026 STA380H5 final project
+Repository for 2026 STA380H5 final project
 
 Team name: Chou Why did
 
