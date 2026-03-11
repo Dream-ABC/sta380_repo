@@ -2,22 +2,23 @@ sim_inputs <- div(
   conditionalPanel(
     condition = "input.modify_type == 'simulation'",
 
+    # TODO: fix all the numerical settings so they are reasonable (e.g., sample size may be too large, #features may be too small, need testing)
     numericInput(inputId = "example_seed",
                  label = "Insert the seed for simulation.",
-                 value = 42),
+                 value = 1),
 
     numericInput(inputId = "sample_size",
                  label = "Insert the sample size.",
-                 value = 100),
+                 value = 10000),
 
     numericInput(inputId = "num_features",
                  label = "Insert the number of features.",
-                 value = 20,
+                 value = 5,
                  min = 2),
 
     numericInput(inputId = "num_relevant",
                  label = "Insert the number of true relevant features.",
-                 value = 5,
+                 value = 1,
                  min = 1),
 
     numericInput(inputId = "num_permutations",
