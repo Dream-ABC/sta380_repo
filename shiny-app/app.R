@@ -2,6 +2,9 @@ library(shiny)
 library(bslib)
 library(shinycssloaders)
 
+source(file.path("R", "ui-sim_input.R"))
+source(file.path("R", "ui-extra.R"))
+
 options(spinner.type = 8, spinner.color = "#6990EE")
 
 ui <- page_sidebar(
