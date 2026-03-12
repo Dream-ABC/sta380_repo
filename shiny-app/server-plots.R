@@ -290,5 +290,5 @@ output$cvm_table_selected <- renderTable({
 #####################################################
 
 output$evaluation_table <- renderTable({
-  evaluation_results()
+  evaluation_results()  # TODO: it doesn't show up
 })
