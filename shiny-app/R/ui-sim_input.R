@@ -3,7 +3,7 @@ sim_inputs <- div(
   conditionalPanel(
     condition = "input.modify_type == 'simulation'",
 
-    # TODO: fix all the numerical settings so they are reasonable (e.g., sample size may be too large, #features may be too small, need testing)
+    # TODO: fix all the numerical settings so they are reasonable
     numericInput(inputId = "example_seed",
                  label = "Insert the seed for simulation.",
                  value = 1),
@@ -56,12 +56,12 @@ sim_graph_inputs <- div(
 
     selectInput(inputId = "selected_feature_1",
                 label = "Select feature 1 for the x-axis.",
-                choices = 1:200,  # TODO: need to be consistent with num_features input
+                choices = 1:20,  # TODO: need to be consistent with num_features input (update dynamically)
                 selected = 1),
 
     selectInput(inputId = "selected_feature_2",
                 label = "Select feature 2 for the y-axis.",
-                choices = 1:200,  # TODO: need to be consistent with num_features input
+                choices = 1:20,  # TODO: need to be consistent with num_features input (update dynamically)
                 selected = 2),
   ), # End conditionalPanel
 

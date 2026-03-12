@@ -1,94 +1,18 @@
-# source needed functions
-source("../R/data_simulation.R", local = TRUE)
-source("../R/permutation_test.R", local = TRUE)
-source("../R/evaluation.R", local = TRUE)
+source("../R/data_simulation.R")
+source("../R/evaluation.R")
+source("../R/permutation_test.R")
 
 global_seed <- reactive(input$example_seed)
 
-sim_data_comp <- reactive({
+sim_data <- reactive({
   set.seed(global_seed())
 
   simulate_mixture_data(
     n = input$sample_size,
     p = input$num_features,
-    n_relevant = input$num_relevant,
-    alpha = 0.8,  # TODO: do we need user input for this?
+    n_relevant = min(input$num_relevant, input$num_features),
+    alpha = 0.8,
     seed = global_seed()
-  )
-})
-
-mean_diff_stat_comp <- reactive({
-  apply(sim_data_comp()$X, 2, function(x) {
-    stat_mean_diff(x, sim_data_comp()$Y)
-  })
-})
-
-ks_stat_comp <- reactive({
-  apply(sim_data_comp()$X, 2, function(x) {
-    stat_ks(x, sim_data_comp()$Y)
-  })
-})
-
-cvm_stat_comp <- reactive({
-  apply(sim_data_comp()$X, 2, function(x) {
-    stat_cvm(x, sim_data_comp()$Y)
-  })
-})
-
-mean_diff_pval_comp <- reactive({
-  permutation_pvalues(
-    X = sim_data_comp()$X,
-    Y = sim_data_comp()$Y,
-    stat_fun = stat_mean_diff,
-    n_shuffles = input$num_permutations
-  )
-})
-
-ks_pval_comp <- reactive({
-  permutation_pvalues(
-    X = sim_data_comp()$X,
-    Y = sim_data_comp()$Y,
-    stat_fun = stat_ks,
-    n_shuffles = input$num_permutations
-  )
-})
-
-cvm_pval_comp <- reactive({
-  permutation_pvalues(
-    X = sim_data_comp()$X,
-    Y = sim_data_comp()$Y,
-    stat_fun = stat_cvm,
-    n_shuffles = input$num_permutations
-  )
-})
-
-mean_diff_selected_comp <- reactive({
-  select_features_permutation(
-    X = sim_data_comp()$X,
-    Y = sim_data_comp()$Y,
-    stat_fun = stat_mean_diff,
-    n_shuffles = input$num_permutations,
-    alpha_level = input$alpha_level
-  )
-})
-
-ks_selected_comp <- reactive({
-  select_features_permutation(
-    X = sim_data_comp()$X,
-    Y = sim_data_comp()$Y,
-    stat_fun = stat_ks,
-    n_shuffles = input$num_permutations,
-    alpha_level = input$alpha_level
-  )
-})
-
-cvm_selected_comp <- reactive({
-  select_features_permutation(
-    X = sim_data_comp()$X,
-    Y = sim_data_comp()$Y,
-    stat_fun = stat_cvm,
-    n_shuffles = input$num_permutations,
-    alpha_level = input$alpha_level
   )
 })
 
@@ -96,40 +20,275 @@ cvm_selected_comp <- reactive({
 # Mean Difference                                   #
 #####################################################
 
-output$mean_diff_plot_overview <- renderPlot({
-  plot(sim_data_comp()$X[, as.numeric(input$selected_feature_1)],
-       sim_data_comp()$X[, as.numeric(input$selected_feature_2)],
-       xlab = paste("Feature", input$selected_feature_1),
-       ylab = paste("Feature", input$selected_feature_2),
-       main = "Scatter plot of the simulated data for selected features
-       under the Mean Difference statistic",
-       pch = 19,
-       col = ifelse(sim_data_comp()$Y == 1, "red", "blue"))
+mean_diff_pvalues <- reactive({
+  permutation_pvalues(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_mean_diff,
+    n_shuffles = input$num_permutations
+  )
 })
 
+mean_diff_statistics <- reactive({
+  apply(sim_data()$X, 2, function(x) stat_mean_diff(x, sim_data()$Y))
+})
+
+mean_diff_selected <- reactive({
+  select_features_permutation(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_mean_diff,
+    n_shuffles = input$num_permutations,
+    alpha_level = input$alpha_level
+  )
+})
+
+#####################################################
+# KS                                                #
+#####################################################
+
+ks_pvalues <- reactive({
+  permutation_pvalues(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_ks,
+    n_shuffles = input$num_permutations
+  )
+})
+
+ks_statistics <- reactive({
+  apply(sim_data()$X, 2, function(x) stat_ks(x, sim_data()$Y))
+})
+
+ks_selected <- reactive({
+  select_features_permutation(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_ks,
+    n_shuffles = input$num_permutations,
+    alpha_level = input$alpha_level
+  )
+})
+
+#####################################################
+# CvM                                               #
+#####################################################
+
+cvm_pvalues <- reactive({
+  permutation_pvalues(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_cvm,
+    n_shuffles = input$num_permutations
+  )
+})
+
+cvm_statistics <- reactive({
+  apply(sim_data()$X, 2, function(x) stat_cvm(x, sim_data()$Y))
+})
+
+cvm_selected <- reactive({
+  select_features_permutation(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_cvm,
+    n_shuffles = input$num_permutations,
+    alpha_level = input$alpha_level
+  )
+})
+
+#####################################################
+# Evaluation                                        #
+#####################################################
+
+evaluation_results <- reactive({
+  selected_features <- switch(
+    input$stat_method_type,
+    "mean_diff" = mean_diff_selected(),
+    "ks" = ks_selected(),
+    "cvm" = cvm_selected()
+  )
+
+  eval_obj <- evaluate_precision_recall(
+    S_truth = sim_data()$S,
+    S_hat = selected_features
+  )
+
+  data.frame(
+    Method = switch(
+      input$stat_method_type,
+      "mean_diff" = "Mean Difference",
+      "ks" = "KS",
+      "cvm" = "CvM"
+    ),
+    Precision = round(eval_obj$precision, input$evaluation_digits),
+    Recall = round(eval_obj$recall, input$evaluation_digits),
+    F1 = round(f1_score(eval_obj$precision, eval_obj$recall),
+               input$evaluation_digits)
+  )
+})
+
+#####################################################
+# Simulated Data Overview                           #
+#####################################################
+
+output$mean_diff_plot_overview <- renderPlot({
+  feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
+  feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
+
+  plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
+       xlab = paste("Feature", feature_1),
+       ylab = paste("Feature", feature_2),
+       main = "Scatter plot of the simulated data",
+       pch = 19,
+       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
+  legend("topright",
+         legend = c("Class 0", "Class 1"),
+         col = c("steelblue", "tomato"),
+         pch = 19)
+})
+
+output$ks_plot_overview <- renderPlot({
+  feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
+  feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
+
+  plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
+       xlab = paste("Feature", feature_1),
+       ylab = paste("Feature", feature_2),
+       main = "Scatter plot of the simulated data",
+       pch = 19,
+       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
+  legend("topright",
+         legend = c("Class 0", "Class 1"),
+         col = c("steelblue", "tomato"),
+         pch = 19)
+})
+
+output$cvm_plot_overview <- renderPlot({
+  feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
+  feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
+
+  plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
+       xlab = paste("Feature", feature_1),
+       ylab = paste("Feature", feature_2),
+       main = "Scatter plot of the simulated data",
+       pch = 19,
+       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
+  legend("topright",
+         legend = c("Class 0", "Class 1"),
+         col = c("steelblue", "tomato"),
+         pch = 19)
+})
+
+#####################################################
+# Permutation p-values                              #
+#####################################################
+
 output$mean_diff_plot_pvalues <- renderPlot({
-  barplot(mean_diff_pval_comp(),
-          names.arg = 1:length(mean_diff_pval_comp()),
+  barplot(mean_diff_pvalues(),
+          names.arg = seq_along(mean_diff_pvalues()),
           xlab = "Feature Index",
           ylab = "Permutation p-value",
-          main = "Permutation p-values based on the Mean Difference statistic",
+          main = "Permutation p-values for all features",
           border = "black",
-          lwd = as.numeric(input$pvalue_bar_lwd))
+          lwd = input$pvalue_bar_lwd,
+          col = "lightblue")
   abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
 })
 
-output$mean_diff_plot_statistics <- renderPlot({
-  barplot(mean_diff_stat_comp(),
-          names.arg = 1:length(mean_diff_stat_comp()),
+output$ks_plot_pvalues <- renderPlot({
+  barplot(ks_pvalues(),
+          names.arg = seq_along(ks_pvalues()),
           xlab = "Feature Index",
-          ylab = "Test Statistic",
-          main = "Feature-wise test statistics based on the Mean Difference statistic",
+          ylab = "Permutation p-value",
+          main = "Permutation p-values for all features",
           border = "black",
-          lwd = as.numeric(input$stat_bar_lwd))
+          lwd = input$pvalue_bar_lwd,
+          col = "lightblue")
+  abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
 })
 
+output$cvm_plot_pvalues <- renderPlot({
+  barplot(cvm_pvalues(),
+          names.arg = seq_along(cvm_pvalues()),
+          xlab = "Feature Index",
+          ylab = "Permutation p-value",
+          main = "Permutation p-values for all features",
+          border = "black",
+          lwd = input$pvalue_bar_lwd,
+          col = "lightblue")
+  abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
+})
+
+#####################################################
+# Test Statistics                                   #
+#####################################################
+
+output$mean_diff_plot_statistics <- renderPlot({
+  barplot(mean_diff_statistics(),
+          names.arg = seq_along(mean_diff_statistics()),
+          xlab = "Feature Index",
+          ylab = "Test Statistic",
+          main = "Mean Difference statistics for all features",
+          border = "black",
+          lwd = input$stat_bar_lwd,
+          col = "lightgreen")
+})
+
+output$ks_plot_statistics <- renderPlot({
+  barplot(ks_statistics(),
+          names.arg = seq_along(ks_statistics()),
+          xlab = "Feature Index",
+          ylab = "Test Statistic",
+          main = "KS statistics for all features",
+          border = "black",
+          lwd = input$stat_bar_lwd,
+          col = "lightgreen")
+})
+
+output$cvm_plot_statistics <- renderPlot({
+  barplot(cvm_statistics(),
+          names.arg = seq_along(cvm_statistics()),
+          xlab = "Feature Index",
+          ylab = "Test Statistic",
+          main = "CvM statistics for all features",
+          border = "black",
+          lwd = input$stat_bar_lwd,
+          col = "lightgreen")
+})
+
+#####################################################
+# Selected Features                                 #
+#####################################################
+
 output$mean_diff_table_selected <- renderTable({
-  data.frame(
-    Selected_Features = mean_diff_selected_comp()
+  selected_df <- data.frame(
+    Selected_Feature = mean_diff_selected()
   )
+
+  head(selected_df, input$selected_table_nrows)
+})
+
+output$ks_table_selected <- renderTable({
+  selected_df <- data.frame(
+    Selected_Feature = ks_selected()
+  )
+
+  head(selected_df, input$selected_table_nrows)
+})
+
+output$cvm_table_selected <- renderTable({
+  selected_df <- data.frame(
+    Selected_Feature = cvm_selected()
+  )
+
+  head(selected_df, input$selected_table_nrows)
+})
+
+#####################################################
+# Evaluation Table                                  #
+#####################################################
+
+output$evaluation_table <- renderTable({
+  evaluation_results()  # TODO: it doesn't show up
 })
