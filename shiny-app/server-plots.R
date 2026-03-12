@@ -1,7 +1,7 @@
 # source needed functions
-source("data_simulation.R", local = TRUE)
-source("permutation_test.R", local = TRUE)
-source("evaluation.R", local = TRUE)
+source("R/data_simulation.R", local = TRUE)
+source("R/permutation_test.R", local = TRUE)
+source("R/evaluation.R", local = TRUE)
 
 global_seed <- reactive(input$example_seed)
 
