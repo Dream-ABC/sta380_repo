@@ -32,13 +32,6 @@ sim_inputs <- div(
                  min = 0,
                  max = 1,
                  step = 0.01),
-
-    selectInput(inputId = "stat_method_type",
-                label = "Select the test statistic method.",
-                choices = list("Mean Difference" = "mean_diff",
-                               "KS" = "ks",
-                               "CvM" = "cvm"),
-                selected = "mean_diff"),
   ), # End conditionalPanel
 )
 
