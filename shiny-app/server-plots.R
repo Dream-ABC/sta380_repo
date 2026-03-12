@@ -1,237 +1,294 @@
-
-mu_list = reactive({create_necessary_vector(input$mean_vector)})
-sigma_list = reactive({create_necessary_vector(input$sd_vector)})
+source("../R/data_simulation.R")
+source("../R/evaluation.R")
+source("../R/permutation_test.R")
 
 global_seed <- reactive(input$example_seed)
 
-indmh_comp <- reactive({
+sim_data <- reactive({
   set.seed(global_seed())
-  sigma_matrix <- matrix(c(sigma_list()[1], input$rho,
-                           input$rho, sigma_list()[2]), nrow = 2, ncol = 2)
-  test_pt1 <- rmvnorm(n = 1, mean = mu_list(), sigma = sigma_matrix)
 
-  rbivariate.mh_ind(N = input$sample_size,
-                    burn = 100,
-                    Y0 = test_pt1,
-                    sigma_matrix = sigma_matrix,
-                    mu_vec = mu_list())
-})
-
-rwmh_comp <- reactive({
-  set.seed(global_seed())
-  sigma_matrix <- matrix(c(sigma_list()[1], input$rho,
-                           input$rho, sigma_list()[2]), nrow = 2, ncol = 2)
-  test_pt2 <- rmvnorm(n = 1, mean = mu_list(), sigma = sigma_matrix)
-
-  rbivariate.rwmh(N = input$sample_size,
-                  burn = 100,
-                  Y0 = test_pt2,
-                  sigma_matrix = sigma_matrix,
-                  mu_vec = mu_list())
-})
-
-gibbs_comp <- reactive({
-  set.seed(global_seed())
-  sigma_matrix <- matrix(c(sigma_list()[1], input$rho,
-                           input$rho, sigma_list()[2]), nrow = 2, ncol = 2)
-  test_pt3 <- rmvnorm(n = 1, mean = mu_list(), sigma = sigma_matrix)
-
-  gibbs_sampler(N = input$sample_size,
-                burn = 100,
-                Y0 = test_pt3,
-                sigma_matrix = sigma_matrix,
-                mu_vec = mu_list())
+  simulate_mixture_data(
+    n = input$sample_size,
+    p = input$num_features,
+    n_relevant = min(input$num_relevant, input$num_features),
+    alpha = 0.8,
+    seed = global_seed()
+  )
 })
 
 #####################################################
-# Independent MH                                    #
+# Mean Difference                                   #
 #####################################################
 
-output$indmh_plot_scat <- renderPlot({
-  plot(indmh_comp()[,1], indmh_comp()[,2],
-       xlab = "Variable 1",
-       ylab = "Variable 2",
-       main = "Scatter plot of the simulated bivariate Gaussian samples obtained
-     via the independence Metropolis–Hastings algorithm",
-       pch = as.numeric(input$scat_pch),
-       bg = input$scat_line_col,
-       col = input$scat_col)
+mean_diff_pvalues <- reactive({
+  permutation_pvalues(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_mean_diff,
+    n_shuffles = input$num_permutations
+  )
 })
 
-output$indmh_plot_hist <- renderPlot({
-  par(mfcol=c(1,2))
-
-  xx = seq(-4,4,by=0.01)
-  hist(indmh_comp()[,1], breaks=100, freq=FALSE,
-       main = "Histogram of Marginal Distribution of Variable 1",
-       xlab = "Variable 1",
-       col = input$hist_col,
-       border = "white")
-  lines(xx, dnorm(xx, mean = mu_list()[1], sd = sigma_list()[1]),
-        col = input$hist_line_col,
-        lwd = as.numeric(input$hist_line_lwd),
-        lty = as.numeric(input$hist_line_lty))
-
-  hist(indmh_comp()[,2], breaks=100, freq=FALSE,
-       main = "Histogram of Marginal Distribution of Variable 2",
-       xlab = "Variable 1",
-       col = input$hist_col,
-       border = "white")
-  lines(xx, dnorm(xx,  mu_list()[2], sd = sigma_list()[2]),
-        col = input$hist_line_col,
-        lwd = as.numeric(input$hist_line_lwd),
-        lty = as.numeric(input$hist_line_lty))
+mean_diff_statistics <- reactive({
+  apply(sim_data()$X, 2, function(x) stat_mean_diff(x, sim_data()$Y))
 })
 
-output$indmh_plot_qqplot <- renderPlot({
-  par(mfcol=c(1,2))
-
-  qqnorm(indmh_comp()[,1],
-         main = "Normal Q–Q Plot for the Marginal Distribution of Variable 1",
-         pch = as.numeric(input$qqplot_pch),
-         col = input$qqplot_col,
-         bg = input$qqplot_border_col)
-  qqline(indmh_comp()[,1],
-         col = input$qqplot_line_col,
-         lwd = as.numeric(input$qqplot_line_lwd),
-         lty = as.numeric(input$qqplot_line_lty))
-
-  qqnorm(indmh_comp()[,2],
-         main = "Normal Q–Q Plot for the Marginal Distribution of Variable 2",
-         pch = as.numeric(input$qqplot_pch),
-         col = input$qqplot_col,
-         bg = input$qqplot_border_col)
-  qqline(indmh_comp()[,2],
-         col = input$qqplot_line_col,
-         lwd = as.numeric(input$qqplot_line_lwd),
-         lty = as.numeric(input$qqplot_line_lty))
+mean_diff_selected <- reactive({
+  select_features_permutation(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_mean_diff,
+    n_shuffles = input$num_permutations,
+    alpha_level = input$alpha_level
+  )
 })
 
 #####################################################
-# Random Walk MH                                    #
+# KS                                                #
 #####################################################
 
-output$rwmh_plot_scat <- renderPlot({
-  plot(rwmh_comp()[,1], rwmh_comp()[,2],
-       xlab = "Variable 1",
-       ylab = "Variable 2",
-       main = "Scatter plot of the simulated bivariate Gaussian samples obtained
-     via the random walk Metropolis–Hastings algorithm",
-       pch = as.numeric(input$scat_pch),
-       bg = input$scat_line_col,
-       col = input$scat_col)
+ks_pvalues <- reactive({
+  permutation_pvalues(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_ks,
+    n_shuffles = input$num_permutations
+  )
 })
 
-output$rwmh_plot_hist <- renderPlot({
-  par(mfcol=c(1,2))
-
-  xx = seq(-4,4,by=0.01)
-  hist(rwmh_comp()[,1], breaks=100, freq=FALSE,
-       main = "Histogram of Marginal Distribution of Variable 1",
-       xlab = "Variable 1",
-       col = input$hist_col,
-       border = "white")
-  lines(xx, dnorm(xx, mean = mu_list()[1], sd = sigma_list()[1]),
-        col = input$hist_line_col,
-        lwd = as.numeric(input$hist_line_lwd),
-        lty = as.numeric(input$hist_line_lty))
-
-  hist(rwmh_comp()[,2], breaks=100, freq=FALSE,
-       main = "Histogram of Marginal Distribution of Variable 2",
-       xlab = "Variable 1",
-       col = input$hist_col,
-       border = "white")
-  lines(xx, dnorm(xx,  mu_list()[2], sd = sigma_list()[2]),
-        col = input$hist_line_col,
-        lwd = as.numeric(input$hist_line_lwd),
-        lty = as.numeric(input$hist_line_lty))
+ks_statistics <- reactive({
+  apply(sim_data()$X, 2, function(x) stat_ks(x, sim_data()$Y))
 })
 
-output$rwmh_plot_qqplot <- renderPlot({
-  par(mfcol=c(1,2))
-
-  qqnorm(rwmh_comp()[,1],
-         main = "Normal Q–Q Plot for the Marginal Distribution of Variable 1",
-         pch = as.numeric(input$qqplot_pch),
-         col = input$qqplot_col,
-         bg = input$qqplot_border_col)
-  qqline(rwmh_comp()[,1],
-         col = input$qqplot_line_col,
-         lwd = as.numeric(input$qqplot_line_lwd),
-         lty = as.numeric(input$qqplot_line_lty))
-
-  qqnorm(rwmh_comp()[,2],
-         main = "Normal Q–Q Plot for the Marginal Distribution of Variable 2",
-         pch = as.numeric(input$qqplot_pch),
-         col = input$qqplot_col,
-         bg = input$qqplot_border_col)
-  qqline(rwmh_comp()[,2],
-         col = input$qqplot_line_col,
-         lwd = as.numeric(input$qqplot_line_lwd),
-         lty = as.numeric(input$qqplot_line_lty))
+ks_selected <- reactive({
+  select_features_permutation(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_ks,
+    n_shuffles = input$num_permutations,
+    alpha_level = input$alpha_level
+  )
 })
-
 
 #####################################################
-# Gibbs Sampler                                     #
+# CvM                                               #
 #####################################################
 
-output$gibbs_plot_scat <- renderPlot({
-  plot(gibbs_comp()[,1], gibbs_comp()[,2],
-       xlab = "Variable 1",
-       ylab = "Variable 2",
-       main = "Scatter plot of the simulated bivariate Gaussian samples obtained
-     via the Gibbs sampler",
-       pch = as.numeric(input$scat_pch),
-       bg = input$scat_line_col,
-       col = input$scat_col)
+cvm_pvalues <- reactive({
+  permutation_pvalues(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_cvm,
+    n_shuffles = input$num_permutations
+  )
 })
 
-output$gibbs_plot_hist <- renderPlot({
-  par(mfcol=c(1,2))
-
-  xx = seq(-4,4,by=0.01)
-  hist(gibbs_comp()[,1], breaks=100, freq=FALSE,
-       main = "Histogram of Marginal Distribution of Variable 1",
-       xlab = "Variable 1",
-       col = input$hist_col,
-       border = "white")
-  lines(xx, dnorm(xx, mean = mu_list()[1], sd = sigma_list()[1]),
-        col = input$hist_line_col,
-        lwd = as.numeric(input$hist_line_lwd),
-        lty = as.numeric(input$hist_line_lty))
-
-  hist(gibbs_comp()[,2], breaks=100, freq=FALSE,
-       main = "Histogram of Marginal Distribution of Variable 2",
-       xlab = "Variable 1",
-       col = input$hist_col,
-       border = "white")
-  lines(xx, dnorm(xx,  mu_list()[2], sd = sigma_list()[2]),
-        col = input$hist_line_col,
-        lwd = as.numeric(input$hist_line_lwd),
-        lty = as.numeric(input$hist_line_lty))
+cvm_statistics <- reactive({
+  apply(sim_data()$X, 2, function(x) stat_cvm(x, sim_data()$Y))
 })
 
-output$gibbs_plot_qqplot <- renderPlot({
-  par(mfcol=c(1,2))
+cvm_selected <- reactive({
+  select_features_permutation(
+    X = sim_data()$X,
+    Y = sim_data()$Y,
+    stat_fun = stat_cvm,
+    n_shuffles = input$num_permutations,
+    alpha_level = input$alpha_level
+  )
+})
 
-  qqnorm(gibbs_comp()[,1],
-         main = "Normal Q–Q Plot for the Marginal Distribution of Variable 1",
-         pch = as.numeric(input$qqplot_pch),
-         col = input$qqplot_col,
-         bg = input$qqplot_border_col)
-  qqline(gibbs_comp()[,1],
-         col = input$qqplot_line_col,
-         lwd = as.numeric(input$qqplot_line_lwd),
-         lty = as.numeric(input$qqplot_line_lty))
+#####################################################
+# Evaluation                                        #
+#####################################################
 
-  qqnorm(gibbs_comp()[,2],
-         main = "Normal Q–Q Plot for the Marginal Distribution of Variable 2",
-         pch = as.numeric(input$qqplot_pch),
-         col = input$qqplot_col,
-         bg = input$qqplot_border_col)
-  qqline(gibbs_comp()[,2],
-         col = input$qqplot_line_col,
-         lwd = as.numeric(input$qqplot_line_lwd),
-         lty = as.numeric(input$qqplot_line_lty))
+evaluation_results <- reactive({
+  selected_features <- switch(
+    input$stat_method_type,
+    "mean_diff" = mean_diff_selected(),
+    "ks" = ks_selected(),
+    "cvm" = cvm_selected()
+  )
+
+  eval_obj <- evaluate_precision_recall(
+    S_truth = sim_data()$S,
+    S_hat = selected_features
+  )
+
+  data.frame(
+    Method = switch(
+      input$stat_method_type,
+      "mean_diff" = "Mean Difference",
+      "ks" = "KS",
+      "cvm" = "CvM"
+    ),
+    Precision = round(eval_obj$precision, input$evaluation_digits),
+    Recall = round(eval_obj$recall, input$evaluation_digits),
+    F1 = round(f1_score(eval_obj$precision, eval_obj$recall),
+               input$evaluation_digits)
+  )
+})
+
+#####################################################
+# Simulated Data Overview                           #
+#####################################################
+
+output$mean_diff_plot_overview <- renderPlot({
+  feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
+  feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
+
+  plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
+       xlab = paste("Feature", feature_1),
+       ylab = paste("Feature", feature_2),
+       main = "Scatter plot of the simulated data",
+       pch = 19,
+       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
+  legend("topright",
+         legend = c("Class 0", "Class 1"),
+         col = c("steelblue", "tomato"),
+         pch = 19)
+})
+
+output$ks_plot_overview <- renderPlot({
+  feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
+  feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
+
+  plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
+       xlab = paste("Feature", feature_1),
+       ylab = paste("Feature", feature_2),
+       main = "Scatter plot of the simulated data",
+       pch = 19,
+       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
+  legend("topright",
+         legend = c("Class 0", "Class 1"),
+         col = c("steelblue", "tomato"),
+         pch = 19)
+})
+
+output$cvm_plot_overview <- renderPlot({
+  feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
+  feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
+
+  plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
+       xlab = paste("Feature", feature_1),
+       ylab = paste("Feature", feature_2),
+       main = "Scatter plot of the simulated data",
+       pch = 19,
+       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
+  legend("topright",
+         legend = c("Class 0", "Class 1"),
+         col = c("steelblue", "tomato"),
+         pch = 19)
+})
+
+#####################################################
+# Permutation p-values                              #
+#####################################################
+
+output$mean_diff_plot_pvalues <- renderPlot({
+  barplot(mean_diff_pvalues(),
+          names.arg = seq_along(mean_diff_pvalues()),
+          xlab = "Feature Index",
+          ylab = "Permutation p-value",
+          main = "Permutation p-values for all features",
+          border = "black",
+          lwd = input$pvalue_bar_lwd,
+          col = "lightblue")
+  abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
+})
+
+output$ks_plot_pvalues <- renderPlot({
+  barplot(ks_pvalues(),
+          names.arg = seq_along(ks_pvalues()),
+          xlab = "Feature Index",
+          ylab = "Permutation p-value",
+          main = "Permutation p-values for all features",
+          border = "black",
+          lwd = input$pvalue_bar_lwd,
+          col = "lightblue")
+  abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
+})
+
+output$cvm_plot_pvalues <- renderPlot({
+  barplot(cvm_pvalues(),
+          names.arg = seq_along(cvm_pvalues()),
+          xlab = "Feature Index",
+          ylab = "Permutation p-value",
+          main = "Permutation p-values for all features",
+          border = "black",
+          lwd = input$pvalue_bar_lwd,
+          col = "lightblue")
+  abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
+})
+
+#####################################################
+# Test Statistics                                   #
+#####################################################
+
+output$mean_diff_plot_statistics <- renderPlot({
+  barplot(mean_diff_statistics(),
+          names.arg = seq_along(mean_diff_statistics()),
+          xlab = "Feature Index",
+          ylab = "Test Statistic",
+          main = "Mean Difference statistics for all features",
+          border = "black",
+          lwd = input$stat_bar_lwd,
+          col = "lightgreen")
+})
+
+output$ks_plot_statistics <- renderPlot({
+  barplot(ks_statistics(),
+          names.arg = seq_along(ks_statistics()),
+          xlab = "Feature Index",
+          ylab = "Test Statistic",
+          main = "KS statistics for all features",
+          border = "black",
+          lwd = input$stat_bar_lwd,
+          col = "lightgreen")
+})
+
+output$cvm_plot_statistics <- renderPlot({
+  barplot(cvm_statistics(),
+          names.arg = seq_along(cvm_statistics()),
+          xlab = "Feature Index",
+          ylab = "Test Statistic",
+          main = "CvM statistics for all features",
+          border = "black",
+          lwd = input$stat_bar_lwd,
+          col = "lightgreen")
+})
+
+#####################################################
+# Selected Features                                 #
+#####################################################
+
+output$mean_diff_table_selected <- renderTable({
+  selected_df <- data.frame(
+    Selected_Feature = mean_diff_selected()
+  )
+
+  head(selected_df, input$selected_table_nrows)
+})
+
+output$ks_table_selected <- renderTable({
+  selected_df <- data.frame(
+    Selected_Feature = ks_selected()
+  )
+
+  head(selected_df, input$selected_table_nrows)
+})
+
+output$cvm_table_selected <- renderTable({
+  selected_df <- data.frame(
+    Selected_Feature = cvm_selected()
+  )
+
+  head(selected_df, input$selected_table_nrows)
+})
+
+#####################################################
+# Evaluation Table                                  #
+#####################################################
+
+output$evaluation_table <- renderTable({
+  evaluation_results()
 })
