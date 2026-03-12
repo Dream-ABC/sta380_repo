@@ -1,3 +1,4 @@
+
 sim_inputs <- div(
   conditionalPanel(
     condition = "input.modify_type == 'simulation'",
@@ -7,24 +8,36 @@ sim_inputs <- div(
                  label = "Insert the seed for simulation.",
                  value = 1),
 
-    numericInput(inputId = "sample_size",
-                 label = "Insert the sample size.",
-                 value = 10000),
+    #numericInput(inputId = "sample_size",
+    #             label = "Insert the sample size.",
+    #             value = 10000),
 
-    numericInput(inputId = "num_features",
-                 label = "Insert the number of features.",
-                 value = 5,
-                 min = 2),
+    sliderInput(inputId = "sample_size",
+                label = "Select the sample size (n).",
+                min = 50, max = 500, value = 200, step = 10),
+    
+    #numericInput(inputId = "num_features",
+    #             label = "Insert the number of features.",
+    #             value = 5,
+    #             min = 2),
 
-    numericInput(inputId = "num_relevant",
-                 label = "Insert the number of true relevant features.",
-                 value = 1,
-                 min = 1),
+    sliderInput(inputId = "num_features",
+                label = "Select the number of features (p).",
+                min = 10, max = 200, value = 100, step = 5),
+    
+    #numericInput(inputId = "num_relevant",
+    #             label = "Insert the number of true relevant features.",
+    #             value = 1,
+    #             min = 1),
 
+    sliderInput(inputId = "num_relevant",
+                label = "Select the number of true relevant features (s).",
+                min = 1, max = 50, value = 5, step = 1),
+    
     numericInput(inputId = "num_permutations",
                  label = "Insert the number of permutations.",
                  value = 100,
-                 min = 1),
+                 min = 1, max = 1000),
 
     numericInput(inputId = "alpha_level",
                  label = "Insert the significance level.",
