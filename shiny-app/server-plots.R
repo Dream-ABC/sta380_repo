@@ -1,3 +1,8 @@
+# source needed functions
+source("data_simulation.R", local = TRUE)
+source("permutation_test.R", local = TRUE)
+source("evaluation.R", local = TRUE)
+
 global_seed <- reactive(input$example_seed)
 
 sim_data_comp <- reactive({
