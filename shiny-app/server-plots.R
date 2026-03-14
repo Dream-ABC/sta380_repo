@@ -167,7 +167,8 @@ output$mean_diff_plot_overview <- renderPlot({
        cex.lab = 1,
        cex.axis = 1,
        cex.main = 1,
-       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
+       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"),
+       asp = 1)
 
   legend("topright",
          legend = c("Class 0", "Class 1"),
