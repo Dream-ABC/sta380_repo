@@ -58,7 +58,7 @@ ui <- page_sidebar(
     
     conditionalPanel(
       condition = "input.graph_version == 'overview'",
-      withSpinner(plotOutput("mean_diff_plot_overview", height = "300px"))  # name to be changed
+      withSpinner(plotOutput("mean_diff_plot_overview", height = "800px"))  # name to be changed
     ), # end of Conditional Panel
     
     conditionalPanel(
