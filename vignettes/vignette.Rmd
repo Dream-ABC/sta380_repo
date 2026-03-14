@@ -303,7 +303,7 @@ For the Basic Implementation, ChatGPT was used to:
 - Suggest plotting code for some of the visualizations in the vignette, and
 - Help identify and fix minor grammar issues in the documentation.
 
-For the Package Compiling checkpoint, no AI is used.
+For the Package Compiling and Website Prototype checkpoint, no AI is used.
 
 All code and descriptions were reviewed and veriefied by the author
 
