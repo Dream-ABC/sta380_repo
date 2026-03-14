@@ -156,7 +156,6 @@ evaluation_results <- reactive({
 #####################################################
  
 output$mean_diff_plot_overview <- renderPlot({
-  
   feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
   feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
  
@@ -165,47 +164,50 @@ output$mean_diff_plot_overview <- renderPlot({
        ylab = paste("Feature", feature_2),
        main = "Scatter plot of the simulated data",
        pch = 19,
-       cex.lab = 0.8,
-       cex.axis = 0.8,
-       cex.main = 0.8,
+       cex.lab = 1,
+       cex.axis = 1,
+       cex.main = 1,
        col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
 
   legend("topright",
          legend = c("Class 0", "Class 1"),
          col = c("steelblue", "tomato"),
          pch = 19,
-         cex = 1.1)
+         cex = 0.8)
 }, res = 120, execOnResize = TRUE)
 
 output$ks_plot_overview <- renderPlot({
   feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
   feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
   
-  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
        xlab = paste("Feature", feature_1),
        ylab = paste("Feature", feature_2),
        main = "Scatter plot of the simulated data",
        pch = 19,
+       cex.lab = 1,
+       cex.axis = 1,
+       cex.main = 1,
        col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
   legend("topright",
          legend = c("Class 0", "Class 1"),
          col = c("steelblue", "tomato"),
          pch = 19,
-         text.col = "black",
-         bg = "white")
-})
+         cex = 0.8)
+}, res = 120, execOnResize = TRUE)
 
 output$cvm_plot_overview <- renderPlot({
   feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
   feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
   
-  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
        xlab = paste("Feature", feature_1),
        ylab = paste("Feature", feature_2),
        main = "Scatter plot of the simulated data",
        pch = 19,
+       cex.lab = 1,
+       cex.axis = 1,
+       cex.main = 1,
        col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
   legend("topright",
          legend = c("Class 0", "Class 1"),
@@ -213,14 +215,13 @@ output$cvm_plot_overview <- renderPlot({
          pch = 19,
          text.col = "black",
          bg = "white")
-})
+}, res = 120, execOnResize = TRUE)
 
 #####################################################
 # Permutation p-values                              #
 #####################################################
 
 output$mean_diff_plot_pvalues <- renderPlot({
-  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(mean_diff_pvalues(),
           names.arg = seq_along(mean_diff_pvalues()),
           xlab = "Feature Index",
@@ -228,12 +229,14 @@ output$mean_diff_plot_pvalues <- renderPlot({
           main = "Permutation p-values for all features",
           border = "black",
           # lwd = input$pvalue_bar_lwd,
+          cex.lab = 1,
+          cex.axis = 1,
+          cex.main = 1,
           col = "lightblue")
   abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
-})
+}, res = 120, execOnResize = TRUE)
 
 output$ks_plot_pvalues <- renderPlot({
-  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(ks_pvalues(),
           names.arg = seq_along(ks_pvalues()),
           xlab = "Feature Index",
@@ -241,12 +244,14 @@ output$ks_plot_pvalues <- renderPlot({
           main = "Permutation p-values for all features",
           border = "black",
           # lwd = input$pvalue_bar_lwd,
+          cex.lab = 1,
+          cex.axis = 1,
+          cex.main = 1,
           col = "lightblue")
   abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
-})
+}, res = 120, execOnResize = TRUE)
 
 output$cvm_plot_pvalues <- renderPlot({
-  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(cvm_pvalues(),
           names.arg = seq_along(cvm_pvalues()),
           xlab = "Feature Index",
@@ -254,16 +259,18 @@ output$cvm_plot_pvalues <- renderPlot({
           main = "Permutation p-values for all features",
           border = "black",
           # lwd = input$pvalue_bar_lwd,
+          cex.lab = 1,
+          cex.axis = 1,
+          cex.main = 1,
           col = "lightblue")
   abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
-})
+}, res = 120, execOnResize = TRUE)
 
 #####################################################
 # Test Statistics                                   #
 #####################################################
 
 output$mean_diff_plot_statistics <- renderPlot({
-  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(mean_diff_statistics(),
           names.arg = seq_along(mean_diff_statistics()),
           xlab = "Feature Index",
@@ -271,11 +278,13 @@ output$mean_diff_plot_statistics <- renderPlot({
           main = "Mean Difference statistics for all features",
           border = "black",
           # lwd = input$stat_bar_lwd,
+          cex.lab = 1,
+          cex.axis = 1,
+          cex.main = 1,
           col = "lightgreen")
-})
+}, res = 120, execOnResize = TRUE)
 
 output$ks_plot_statistics <- renderPlot({
-  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(ks_statistics(),
           names.arg = seq_along(ks_statistics()),
           xlab = "Feature Index",
@@ -283,11 +292,13 @@ output$ks_plot_statistics <- renderPlot({
           main = "KS statistics for all features",
           border = "black",
           # lwd = input$stat_bar_lwd,
+          cex.lab = 1,
+          cex.axis = 1,
+          cex.main = 1,
           col = "lightgreen")
-})
+}, res = 120, execOnResize = TRUE)
 
 output$cvm_plot_statistics <- renderPlot({
-  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(cvm_statistics(),
           names.arg = seq_along(cvm_statistics()),
           xlab = "Feature Index",
@@ -295,8 +306,11 @@ output$cvm_plot_statistics <- renderPlot({
           main = "CvM statistics for all features",
           border = "black",
           # lwd = input$stat_bar_lwd,
+          cex.lab = 1,
+          cex.axis = 1,
+          cex.main = 1,
           col = "lightgreen")
-})
+}, res = 120, execOnResize = TRUE)
 
 #####################################################
 # Selected Features                                 #
