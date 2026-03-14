@@ -164,11 +164,10 @@ output$mean_diff_plot_overview <- renderPlot({
        ylab = paste("Feature", feature_2),
        main = "Scatter plot of the simulated data",
        pch = 19,
-       cex.lab = 1,
-       cex.axis = 1,
-       cex.main = 1,
-       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"),
-       asp = 1)
+       cex.lab = 0.8,
+       cex.axis = 0.8,
+       cex.main = 0.8,
+       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
 
   legend("topright",
          legend = c("Class 0", "Class 1"),
@@ -186,9 +185,9 @@ output$ks_plot_overview <- renderPlot({
        ylab = paste("Feature", feature_2),
        main = "Scatter plot of the simulated data",
        pch = 19,
-       cex.lab = 1,
-       cex.axis = 1,
-       cex.main = 1,
+       cex.lab = 0.8,
+       cex.axis = 0.8,
+       cex.main = 0.8,
        col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
   legend("topright",
          legend = c("Class 0", "Class 1"),
@@ -206,9 +205,9 @@ output$cvm_plot_overview <- renderPlot({
        ylab = paste("Feature", feature_2),
        main = "Scatter plot of the simulated data",
        pch = 19,
-       cex.lab = 1,
-       cex.axis = 1,
-       cex.main = 1,
+       cex.lab = 0.8,
+       cex.axis = 0.8,
+       cex.main = 0.8,
        col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
   legend("topright",
          legend = c("Class 0", "Class 1"),
@@ -230,9 +229,9 @@ output$mean_diff_plot_pvalues <- renderPlot({
           main = "Permutation p-values for all features",
           border = "black",
           # lwd = input$pvalue_bar_lwd,
-          cex.lab = 1,
-          cex.axis = 1,
-          cex.main = 1,
+          cex.lab = 0.8,
+          cex.axis = 0.8,
+          cex.main = 0.8,
           col = "lightblue")
   abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
 }, res = 120, execOnResize = TRUE)
@@ -245,9 +244,9 @@ output$ks_plot_pvalues <- renderPlot({
           main = "Permutation p-values for all features",
           border = "black",
           # lwd = input$pvalue_bar_lwd,
-          cex.lab = 1,
-          cex.axis = 1,
-          cex.main = 1,
+          cex.lab = 0.8,
+          cex.axis = 0.8,
+          cex.main = 0.8,
           col = "lightblue")
   abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
 }, res = 120, execOnResize = TRUE)
@@ -260,9 +259,9 @@ output$cvm_plot_pvalues <- renderPlot({
           main = "Permutation p-values for all features",
           border = "black",
           # lwd = input$pvalue_bar_lwd,
-          cex.lab = 1,
-          cex.axis = 1,
-          cex.main = 1,
+          cex.lab = 0.8,
+          cex.axis = 0.8,
+          cex.main = 0.8,
           col = "lightblue")
   abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
 }, res = 120, execOnResize = TRUE)
@@ -279,9 +278,9 @@ output$mean_diff_plot_statistics <- renderPlot({
           main = "Mean Difference statistics for all features",
           border = "black",
           # lwd = input$stat_bar_lwd,
-          cex.lab = 1,
-          cex.axis = 1,
-          cex.main = 1,
+          cex.lab = 0.8,
+          cex.axis = 0.8,
+          cex.main = 0.8,
           col = "lightgreen")
 }, res = 120, execOnResize = TRUE)
 
@@ -293,9 +292,9 @@ output$ks_plot_statistics <- renderPlot({
           main = "KS statistics for all features",
           border = "black",
           # lwd = input$stat_bar_lwd,
-          cex.lab = 1,
-          cex.axis = 1,
-          cex.main = 1,
+          cex.lab = 0.8,
+          cex.axis = 0.8,
+          cex.main = 0.8,
           col = "lightgreen")
 }, res = 120, execOnResize = TRUE)
 
@@ -307,9 +306,9 @@ output$cvm_plot_statistics <- renderPlot({
           main = "CvM statistics for all features",
           border = "black",
           # lwd = input$stat_bar_lwd,
-          cex.lab = 1,
-          cex.axis = 1,
-          cex.main = 1,
+          cex.lab = 0.8,
+          cex.axis = 0.8,
+          cex.main = 0.8,
           col = "lightgreen")
 }, res = 120, execOnResize = TRUE)
 
