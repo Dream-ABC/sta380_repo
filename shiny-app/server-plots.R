@@ -150,6 +150,7 @@ output$mean_diff_plot_overview <- renderPlot({
   feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
   feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
   
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
        xlab = paste("Feature", feature_1),
        ylab = paste("Feature", feature_2),
@@ -159,13 +160,16 @@ output$mean_diff_plot_overview <- renderPlot({
   legend("topright",
          legend = c("Class 0", "Class 1"),
          col = c("steelblue", "tomato"),
-         pch = 19)
+         pch = 19,
+         text.col = "black",
+         bg = "white")
 })
 
 output$ks_plot_overview <- renderPlot({
   feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
   feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
   
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
        xlab = paste("Feature", feature_1),
        ylab = paste("Feature", feature_2),
@@ -175,13 +179,16 @@ output$ks_plot_overview <- renderPlot({
   legend("topright",
          legend = c("Class 0", "Class 1"),
          col = c("steelblue", "tomato"),
-         pch = 19)
+         pch = 19,
+         text.col = "black",
+         bg = "white")
 })
 
 output$cvm_plot_overview <- renderPlot({
   feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
   feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
   
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
        xlab = paste("Feature", feature_1),
        ylab = paste("Feature", feature_2),
@@ -191,7 +198,9 @@ output$cvm_plot_overview <- renderPlot({
   legend("topright",
          legend = c("Class 0", "Class 1"),
          col = c("steelblue", "tomato"),
-         pch = 19)
+         pch = 19,
+         text.col = "black",
+         bg = "white")
 })
 
 #####################################################
@@ -199,6 +208,7 @@ output$cvm_plot_overview <- renderPlot({
 #####################################################
 
 output$mean_diff_plot_pvalues <- renderPlot({
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(mean_diff_pvalues(),
           names.arg = seq_along(mean_diff_pvalues()),
           xlab = "Feature Index",
@@ -211,6 +221,7 @@ output$mean_diff_plot_pvalues <- renderPlot({
 })
 
 output$ks_plot_pvalues <- renderPlot({
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(ks_pvalues(),
           names.arg = seq_along(ks_pvalues()),
           xlab = "Feature Index",
@@ -223,6 +234,7 @@ output$ks_plot_pvalues <- renderPlot({
 })
 
 output$cvm_plot_pvalues <- renderPlot({
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(cvm_pvalues(),
           names.arg = seq_along(cvm_pvalues()),
           xlab = "Feature Index",
@@ -239,6 +251,7 @@ output$cvm_plot_pvalues <- renderPlot({
 #####################################################
 
 output$mean_diff_plot_statistics <- renderPlot({
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(mean_diff_statistics(),
           names.arg = seq_along(mean_diff_statistics()),
           xlab = "Feature Index",
@@ -250,6 +263,7 @@ output$mean_diff_plot_statistics <- renderPlot({
 })
 
 output$ks_plot_statistics <- renderPlot({
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(ks_statistics(),
           names.arg = seq_along(ks_statistics()),
           xlab = "Feature Index",
@@ -261,6 +275,7 @@ output$ks_plot_statistics <- renderPlot({
 })
 
 output$cvm_plot_statistics <- renderPlot({
+  par(fg = "black", col.axis = "black", col.lab = "black", col.main = "black")
   barplot(cvm_statistics(),
           names.arg = seq_along(cvm_statistics()),
           xlab = "Feature Index",
