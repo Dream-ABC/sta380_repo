@@ -20,7 +20,7 @@ devtools::check()
 
 ## Demo
 
-Demo website link: https://chr1sren-sta380-repo.share.connect.posit.cloud/
+Demo website link: https://dream-abc-chowwhydid-sta380-repo.share.connect.posit.cloud/
 
 ## AI Declaration
 
