@@ -29,33 +29,6 @@ observe({
 })
 
 #####################################################
-# Mean Difference                                   #
-#####################################################
-
-mean_diff_pvalues <- reactive({
-  permutation_pvalues(
-    X = sim_data()$X,
-    Y = sim_data()$Y,
-    stat_fun = stat_mean_diff,
-    n_shuffles = input$num_permutations
-  )
-})
-
-mean_diff_statistics <- reactive({
-  apply(sim_data()$X, 2, function(x) stat_mean_diff(x, sim_data()$Y))
-})
-
-mean_diff_selected <- reactive({
-  select_features_permutation(
-    X = sim_data()$X,
-    Y = sim_data()$Y,
-    stat_fun = stat_mean_diff,
-    n_shuffles = input$num_permutations,
-    alpha_level = input$alpha_level
-  )
-})
-
-#####################################################
 # KS                                                #
 #####################################################
 
@@ -116,7 +89,6 @@ cvm_selected <- reactive({
 evaluation_results <- reactive({
   selected_features <- switch(
     input$stat_method_type,
-    "mean_diff" = mean_diff_selected(),
     "ks" = ks_selected(),
     "cvm" = cvm_selected()
   )
@@ -129,7 +101,6 @@ evaluation_results <- reactive({
   data.frame(
     Method = switch(
       input$stat_method_type,
-      "mean_diff" = "Mean Difference",
       "ks" = "KS",
       "cvm" = "CvM"
     ),
@@ -154,27 +125,6 @@ evaluation_results <- reactive({
 #####################################################
 # Simulated Data Overview                           #
 #####################################################
- 
-output$mean_diff_plot_overview <- renderPlot({
-  feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
-  feature_2 <- min(as.numeric(input$selected_feature_2), input$num_features)
- 
-  plot(sim_data()$X[, feature_1], sim_data()$X[, feature_2],
-       xlab = paste("Feature", feature_1),
-       ylab = paste("Feature", feature_2),
-       main = "Scatter plot of the simulated data",
-       pch = 19,
-       cex.lab = 1,
-       cex.axis = 1,
-       cex.main = 1,
-       col = ifelse(sim_data()$Y == 0, "steelblue", "tomato"))
-
-  legend("topright",
-         legend = c("Class 0", "Class 1"),
-         col = c("steelblue", "tomato"),
-         pch = 19,
-         cex = 0.8)
-}, res = 120, execOnResize = TRUE)
 
 output$ks_plot_overview <- renderPlot({
   feature_1 <- min(as.numeric(input$selected_feature_1), input$num_features)
@@ -221,21 +171,6 @@ output$cvm_plot_overview <- renderPlot({
 # Permutation p-values                              #
 #####################################################
 
-output$mean_diff_plot_pvalues <- renderPlot({
-  barplot(mean_diff_pvalues(),
-          names.arg = seq_along(mean_diff_pvalues()),
-          xlab = "Feature Index",
-          ylab = "Permutation p-value",
-          main = "Permutation p-values for all features",
-          border = "black",
-          # lwd = input$pvalue_bar_lwd,
-          cex.lab = 1,
-          cex.axis = 1,
-          cex.main = 1,
-          col = "lightblue")
-  abline(h = input$alpha_level, col = "red", lty = 2, lwd = 2)
-}, res = 120, execOnResize = TRUE)
-
 output$ks_plot_pvalues <- renderPlot({
   barplot(ks_pvalues(),
           names.arg = seq_along(ks_pvalues()),
@@ -270,20 +205,6 @@ output$cvm_plot_pvalues <- renderPlot({
 # Test Statistics                                   #
 #####################################################
 
-output$mean_diff_plot_statistics <- renderPlot({
-  barplot(mean_diff_statistics(),
-          names.arg = seq_along(mean_diff_statistics()),
-          xlab = "Feature Index",
-          ylab = "Test Statistic",
-          main = "Mean Difference statistics for all features",
-          border = "black",
-          # lwd = input$stat_bar_lwd,
-          cex.lab = 1,
-          cex.axis = 1,
-          cex.main = 1,
-          col = "lightgreen")
-}, res = 120, execOnResize = TRUE)
-
 output$ks_plot_statistics <- renderPlot({
   barplot(ks_statistics(),
           names.arg = seq_along(ks_statistics()),
@@ -315,14 +236,6 @@ output$cvm_plot_statistics <- renderPlot({
 #####################################################
 # Selected Features                                 #
 #####################################################
-
-output$mean_diff_table_selected <- renderTable({
-  selected_df <- data.frame(
-    Feature_Index = mean_diff_selected(),
-    P_Value = round(mean_diff_pvalues()[mean_diff_selected()], 4)
-  )
-  head(selected_df, input$selected_table_nrows)
-})
 
 output$ks_table_selected <- renderTable({
   selected_df <- data.frame(

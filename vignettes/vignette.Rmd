@@ -81,50 +81,12 @@ table(sim$Y)  # Data for each class
 
 ## 2. Permutation Testing
 
-### (1) `stat_mean_diff()`
-
-This function computes the absolute difference between the group means of a single feature. A larger value indicates a stronger difference between the two classes. Which is:
-
-$$\text{stat} = |\bar{x}_1 - \bar{x}_0|$$
-```{r}
-# Get the most relevant feature
-stats <- sapply(sim$S, function(j) stat_mean_diff(sim$X[, j], sim$Y))
-best_j <- sim$S[which.max(stats)]
-
-x_relevant <- sim$X[, best_j]  # most strongly relevant feature
-x_irrelevant <- sim$X[, setdiff(1:50, sim$S)[1]] # others
-
-stat_mean_diff(x_relevant, sim$Y)
-stat_mean_diff(x_irrelevant, sim$Y)
-
-# display plot
-boxplot(x_relevant ~ sim$Y,
-        main = "Relevant Feature by Class",
-        xlab = "Class",
-        ylab = "Value",
-        col = c("lightblue", "salmon"))
-
-boxplot(x_irrelevant ~ sim$Y,
-        main = "Irrelevant Feature by Class",
-        xlab = "Class",
-        ylab = "Value",
-        col = c("lightblue", "salmon"))
-```
-
-The relevant feature produces a larger statistic than the irrelevant
-one, confirming that the function captures the signal correctly.
-
-
-The boxplots show that the relevant feature exhibits a clear separation between the two classes, whereas the irrelevant feature shows substantial overlap. This visual difference aligns with the larger test statistic observed earlier.
-
-
-
-### (2) `stat_ks()`
+### (1) `stat_ks()`
 
 This function computes the Kolmogorov-Smirnov statistic, which measures
 the maximum difference between the empirical distributions of a feature
-in class 0 and class 1. Unlike `stat_mean_diff()`, it captures
-differences in the overall shape of the distribution, not just the mean.
+in class 0 and class 1. It captures differences in the overall shape of 
+the distribution, not just the mean.
 
 Notice, the inputs has the following constrain:
 
@@ -132,6 +94,9 @@ Notice, the inputs has the following constrain:
 - `Y` should be binary class labels (0/1) with both classes present.
 
 ```{r}
+x_relevant <- sim$X[, sim$S[1]]  # most strongly relevant feature
+x_irrelevant <- sim$X[, setdiff(seq_len(ncol(sim$X)), sim$S)[1]] # others
+
 stat_ks(x_relevant, sim$Y)
 stat_ks(x_irrelevant, sim$Y)
 ```
@@ -141,7 +106,7 @@ greater distributional difference between the two classes.
 
 
 
-### (3) `stat_cvm()`
+### (2) `stat_cvm()`
 
 This function computes the Cramér–von Mises statistic, which measures
 the overall difference between two empirical distributions by summing
@@ -162,7 +127,7 @@ As expected, the relevant feature yields a larger statistic than the
 irrelevant feature.
 
 
-### (4) `permutation_pvalue_one()`
+### (3) `permutation_pvalue_one()`
 
 This function computes a permutation p-value for a single feature.
 It repeatedly shuffles the class labels **Y** and recomputes the test
@@ -173,17 +138,17 @@ with **Y**.
 
 Notice, the inputs has the following constrain:
 
-- `stat_fun` must be a function of the form `(x, Y) -> scalar` (e.g. `stat_mean_diff`).
+- `stat_fun` must be a function of the form `(x, Y) -> scalar` (e.g. `stat_ks`).
 - `n_shuffles` controls Monte Carlo accuracy; larger values are slower but more stable.
 
 ```{r}
 set.seed(380)
 permutation_pvalue_one(x_relevant, sim$Y, 
-                       stat_fun   = stat_mean_diff, 
+                       stat_fun   = stat_ks, 
                        n_shuffles = 199)
 
 permutation_pvalue_one(x_irrelevant, sim$Y, 
-                       stat_fun   = stat_mean_diff, 
+                       stat_fun   = stat_ks, 
                        n_shuffles = 199)
 ```
 
@@ -191,7 +156,7 @@ The relevant feature gives a much smaller p-value than the irrelevant
 feature, indicating strong evidence of association with **Y**.
 
 
-### (5) `permutation_pvalues()`
+### (4) `permutation_pvalues()`
 
 This function applies `permutation_pvalue_one()` to every column of
 **X**, returning a vector of p-values of length \(p\). This allows us
@@ -205,7 +170,7 @@ Notice, the inputs has the following constrain:
 ```{r}
 set.seed(380)
 pvals <- permutation_pvalues(sim$X, sim$Y,
-                             stat_fun = stat_mean_diff,
+                             stat_fun = stat_ks,
                              n_shuffles = 199)
 length(pvals)
 summary(pvals)
@@ -215,7 +180,7 @@ The function returns one p-value per feature. Features with small
 p-values are candidates for selection.
 
 
-### (6) `select_features_permutation()`
+### (5) `select_features_permutation()`
 
 This function selects features whose permutation p-value is at or below
 a chosen significance level `alpha_level`. It is the final step of the
@@ -229,7 +194,7 @@ Notice, the inputs has the following constrain:
 set.seed(380)
 selected_perm <- select_features_permutation(
   sim$X, sim$Y,
-  stat_fun    = stat_mean_diff,
+  stat_fun    = stat_ks,
   n_shuffles  = 199,
   alpha_level = 0.05
 )

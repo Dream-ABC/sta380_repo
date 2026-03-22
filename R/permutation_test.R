@@ -1,25 +1,3 @@
-#' Test statistic: absolute mean difference between groups.
-#'
-#' @description For a single feature vector x and binary labels Y, returns
-#'   |mean(x`[Y==1]`) - mean(x`[Y==0]`)|.
-#'
-#' @param x Numeric vector of feature values.
-#' @param Y Integer or numeric vector of class labels (0 and 1).
-#' @return Scalar statistic (>= 0).
-#'
-#' @examples
-#' x <- c(1, 2, 3, 10, 11, 12)
-#' Y <- c(0, 0, 0, 1, 1, 1)
-#' stat_mean_diff(x, Y)
-#'
-#' @export
-stat_mean_diff <- function(x, Y) {
-  m0 <- mean(x[Y == 0], na.rm = TRUE)
-  m1 <- mean(x[Y == 1], na.rm = TRUE)
-  abs(m1 - m0)
-}
-
-
 #' Test statistic: Kolmogorov–Smirnov statistic.
 #'
 #' @description Maximum absolute difference between the two empirical CDFs
@@ -90,7 +68,7 @@ stat_cvm <- function(x, Y) {
 #'
 #' @param x Numeric vector of feature values.
 #' @param Y Integer or numeric vector of class labels (0 and 1).
-#' @param stat_fun Function of (x, Y) returning a scalar statistic (e.g. stat_mean_diff).
+#' @param stat_fun Function of (x, Y) returning a scalar statistic (e.g. stat_ks or stat_cvm).
 #' @param n_shuffles Number of permutation samples.
 #' @return Scalar p-value in (0, 1].
 #'
@@ -98,7 +76,7 @@ stat_cvm <- function(x, Y) {
 #' set.seed(1)
 #' x <- rnorm(50, mean = rep(c(0, 1), each = 25))
 #' Y <- rep(0:1, each = 25)
-#' permutation_pvalue_one(x, Y, stat_mean_diff, n_shuffles = 999)
+#' permutation_pvalue_one(x, Y, stat_ks, n_shuffles = 999)
 #'
 #' @importFrom stats runif
 #' @export
@@ -122,14 +100,14 @@ permutation_pvalue_one <- function(x, Y, stat_fun, n_shuffles = 999) {
 #'
 #' @param X n x p numeric matrix of data.
 #' @param Y Length-n vector of class labels (0 and 1).
-#' @param stat_fun Function of (x, Y) returning a scalar (e.g. stat_mean_diff, stat_ks, stat_cvm).
+#' @param stat_fun Function of (x, Y) returning a scalar (e.g. stat_ks, stat_ks, stat_cvm).
 #' @param n_shuffles Number of permutation samples per feature.
 #' @return Numeric vector of length p (p-values).
 #'
 #' @examples
 #' set.seed(1)
 #' sim <- simulate_mixture_data(n = 60, p = 10, n_relevant = 3, alpha = 0.9, seed = 1)
-#' pvals <- permutation_pvalues(sim$X, sim$Y, stat_mean_diff, n_shuffles = 199)
+#' pvals <- permutation_pvalues(sim$X, sim$Y, stat_ks, n_shuffles = 199)
 #' which(pvals < 0.05)
 #'
 #' @export
