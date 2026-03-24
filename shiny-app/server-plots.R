@@ -212,18 +212,19 @@ output$selected_features_detail_table <- renderTable({
   )
 
   df <- data.frame(
-    Feature = seq_along(stats),
-    Truly_relevant = ifelse(outcome %in% c("FP", "FN"), 
+    "Feature" = seq_along(stats),
+    "Truly Relevant" = ifelse(outcome %in% c("FP", "FN"), 
                             sprintf('<span style="color: red; font-weight: bold;">%s</span>', ifelse(truth == 1, "Yes", "No")), 
                             ifelse(truth == 1, "Yes", "No")),
-    Selected = ifelse(outcome %in% c("FP", "FN"), 
+    "Selected" = ifelse(outcome %in% c("FP", "FN"), 
                       sprintf('<span style="color: red; font-weight: bold;">%s</span>', ifelse(pred == 1, "Yes", "No")), 
                       ifelse(pred == 1, "Yes", "No")),
-    Outcome = ifelse(outcome %in% c("FP", "FN"), 
+    "Outcome" = ifelse(outcome %in% c("FP", "FN"), 
                      sprintf('<span style="color: red; font-weight: bold;">%s</span>', outcome), 
                      outcome),
-    P_value = signif(pvals, 4),
-    Statistic = signif(stats, 4)
+    "P-value" = signif(pvals, 4),
+    "Statistic" = signif(stats, 4),
+    check.names = FALSE
   )
 
   df[order(-pred, df$Feature), ]
