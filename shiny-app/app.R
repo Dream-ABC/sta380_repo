@@ -3,24 +3,29 @@ library(bslib)
 
 ui <- page_sidebar(
   theme = bs_theme(version = 5,
-                   bootswatch = "lumen",
+                   bootswatch = "minty",
                    "navbar-bg" = "#FFFFFF",
-                   "body-bg" = "#F8F9FA"),
+                   "body-bg" = "#F9FAFB"),
   
   title = "Permutation Test Playground",
   
   tags$head(
     tags$style(HTML("
       .btn { border-radius: 0; }
-      .alert { border-radius: 0; }
+      .alert { border-radius: 0; font-weight: 500; padding: 12px; border: 1px solid transparent; }
       body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
-      h4 { font-weight: 300; font-size: 1rem; }
+      h4 { font-weight: bold; font-size: 1.05rem; color: #2c3e50; margin-bottom: 12px; }
       .sidebar { padding: 16px; }
-      .results-main .card-header { font-size: 0.95rem; letter-spacing: 0.01em; }
+      .results-main .card-header { font-size: 0.95rem; letter-spacing: 0.01em; color: black !important; font-weight: bold !important; }
       .results-main .table { font-size: 0.82rem; margin-bottom: 0; }
       .results-main .eval-interpret { font-size: 0.88rem; line-height: 1.45; }
       .shiny-table.table > :not(caption) > * > * { padding: 0.28rem 0.45rem; }
       .shiny-html-output { max-width: 100%; }
+      
+      .alert-info { background-color: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+      .alert-primary { background-color: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+      .alert-warning { background-color: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+      .alert-success { background-color: #d8ebd9; color: #2a5a3b; border-color: #c8dec9; }
     "))
   ),
   

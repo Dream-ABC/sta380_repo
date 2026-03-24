@@ -213,13 +213,19 @@ output$selected_features_detail_table <- renderTable({
 
   df <- data.frame(
     Feature = seq_along(stats),
-    Truly_relevant = ifelse(truth == 1, "Yes", "No"),
-    Selected = ifelse(pred == 1, "Yes", "No"),
-    Outcome = outcome,
+    Truly_relevant = ifelse(outcome %in% c("FP", "FN"), 
+                            sprintf('<span style="color: red; font-weight: bold;">%s</span>', ifelse(truth == 1, "Yes", "No")), 
+                            ifelse(truth == 1, "Yes", "No")),
+    Selected = ifelse(outcome %in% c("FP", "FN"), 
+                      sprintf('<span style="color: red; font-weight: bold;">%s</span>', ifelse(pred == 1, "Yes", "No")), 
+                      ifelse(pred == 1, "Yes", "No")),
+    Outcome = ifelse(outcome %in% c("FP", "FN"), 
+                     sprintf('<span style="color: red; font-weight: bold;">%s</span>', outcome), 
+                     outcome),
     P_value = signif(pvals, 4),
     Statistic = signif(stats, 4)
   )
 
   df[order(-pred, df$Feature), ]
-}, striped = TRUE, hover = TRUE, spacing = "xs", digits = 4)
+}, striped = TRUE, hover = TRUE, spacing = "xs", digits = 4, sanitize.text.function = function(x) x)
 
