@@ -77,8 +77,13 @@ ui <- page_sidebar(
       sliderInput(inputId = "alpha_level",
                   label = "Significance Level (α)",
                   min = 0.001, max = 0.2, value = 0.05, step = 0.001),
-      actionButton("test_btn", "Run Test", class = "btn-warning",
-                   title = "Perform permutation test on the generated data")
+      tags$div(
+        class = "mt-2 d-flex gap-2",
+        actionButton("back_to_mc_btn", "Back", class = "btn-secondary",
+                     title = "Go back to Step 1"),
+        actionButton("test_btn", "Run Test", class = "btn-warning",
+                     title = "Perform permutation test on the generated data")
+      )
     ),
     conditionalPanel(
       condition = "output.current_step == 'results'",
@@ -172,6 +177,10 @@ server <- function(input, output, session) {
   
   observeEvent(input$test_btn, {
     current_step("results")
+  })
+  
+  observeEvent(input$back_to_mc_btn, {
+    current_step("mc")
   })
   
   observeEvent(input$try_another_btn, {
