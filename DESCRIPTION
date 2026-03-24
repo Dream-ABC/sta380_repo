@@ -13,7 +13,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.3
 Depends: R (>= 4.0)
-Imports: stats
+Imports: 
+    stats,
+    shiny,
+    bslib,
+    tidyverse,
+    varhandle
 Suggests: 
     testthat (>= 3.0.0),
     rmarkdown,
