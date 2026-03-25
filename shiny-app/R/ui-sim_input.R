@@ -1,6 +1,4 @@
 library(bslib)
-library(bsicons)
-
 
 sim_inputs <- div(
   conditionalPanel(
