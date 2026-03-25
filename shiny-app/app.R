@@ -16,7 +16,7 @@ ui <- page_sidebar(
       body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
       h4 { font-weight: bold; font-size: 1.05rem; color: #2c3e50; margin-bottom: 12px; }
       .sidebar { padding: 16px; }
-      .results-main .card-header { font-size: 0.95rem; letter-spacing: 0.01em; color: black !important; font-weight: bold !important; }
+      .card-header { font-size: 0.95rem; letter-spacing: 0.01em; color: black !important; font-weight: bold !important; }
       .results-main .table { font-size: 0.82rem; margin-bottom: 0; }
       .results-main .eval-interpret { font-size: 0.88rem; line-height: 1.45; }
       .shiny-table.table > :not(caption) > * > * { padding: 0.28rem 0.45rem; }
