@@ -50,15 +50,31 @@ ui <- page_sidebar(
       numericInput(inputId = "example_seed",
                    label = "Random Seed",
                    value = 1),
-      sliderInput(inputId = "sample_size",
-                  label = "Sample Size (n)",
-                  min = 50, max = 500, value = 100, step = 10),
-      sliderInput(inputId = "num_features",
-                  label = "Number of Features (p)",
-                  min = 10, max = 100, value = 20, step = 5),
-      sliderInput(inputId = "num_relevant",
-                  label = "True Relevant Features (s)",
-                  min = 1, max = 10, value = 2, step = 1),
+
+      tooltip(
+        sliderInput(inputId = "sample_size",
+                  label = "Select the sample size (n).",
+                  min = 50, max = 500, value = 200, step = 10),
+        "The total number of sample observations. A larger sample size (n) improves the accuracy of the permutation test but also increases the computation time.",
+        placement = "right"
+      ),
+
+      tooltip(
+        sliderInput(inputId = "num_features",
+                  label = "Select the total number of features (p).",
+                  min = 10, max = 200, value = 100, step = 5),
+        "The total number of features (p) in the dataset, consisting of both true signals and irrelevant noise features. High-dimensional analysis focuses on cases where p is larger than n.",
+        placement = "right"
+      ),
+
+      tooltip(
+        sliderInput(inputId = "num_relevant",
+                  label = "Select the number of true relevant features (s).",
+                  min = 1, max = 50, value = 5, step = 1),
+        "The number of features (s) with actual signal. The goal of feature selection is to correctly identify these true relevant features while ignoring the remaining noise features.",
+        placement = "right"
+      ),
+
       actionButton("generate_btn", "Generate Data", class = "btn-success",
                    title = "Generate simulated data with the specified parameters")
     ),
@@ -71,9 +87,15 @@ ui <- page_sidebar(
                   choices = list("Kolmogorov-Smirnov" = "ks",
                                  "Cramér-von Mises" = "cvm"),
                   selected = "ks"),
-      sliderInput(inputId = "num_permutations",
-                  label = "Number of Permutations",
-                  min = 10, max = 2000, value = 100, step = 10),
+
+      tooltip(
+        sliderInput(inputId = "num_permutations",
+                  label = "Select the number of permutations.",
+                  min = 10, max = 1000, value = 100, step = 10),
+        "The number of times that the labels are randomly shuffled to build the null distribution. A larger value improves the precision of the p-value but also increases the computation time.",
+        placement = "right"
+      ),
+
       sliderInput(inputId = "alpha_level",
                   label = "Significance Level (α)",
                   min = 0.001, max = 0.2, value = 0.05, step = 0.001),
