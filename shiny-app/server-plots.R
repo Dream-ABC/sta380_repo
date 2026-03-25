@@ -30,7 +30,7 @@ plot_feature_barplot <- function(heights,
     border = NA,
     space = if (show_names) 0.25 else 0.12,
     las = 1,
-    cex.names = if (show_names) 0.7 else 0.01,  # Fix: 0 is invalid for cex
+    cex.names = if (show_names) 0.7 else 0.01,  ##
     cex.lab = 0.82,
     cex.main = 0.98,
     ylim = ylim
