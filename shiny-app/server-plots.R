@@ -30,7 +30,7 @@ plot_feature_barplot <- function(heights,
     border = NA,
     space = if (show_names) 0.25 else 0.12,
     las = 1,
-    cex.names = if (show_names) 0.7 else 0,
+    cex.names = if (show_names) 0.7 else 0.01,  # Fix: 0 is invalid for cex
     cex.lab = 0.82,
     cex.main = 0.98,
     ylim = ylim
@@ -38,7 +38,10 @@ plot_feature_barplot <- function(heights,
   if (!show_names) {
     n_lab <- min(12L, p)
     idx <- unique(as.integer(round(seq(1L, p, length.out = n_lab))))
-    axis(1, at = mp[idx], labels = idx, cex.axis = 0.72, tcl = -0.22)
+    idx <- idx[idx >= 1 & idx <= length(mp)]
+    if (length(idx) > 0) {
+      axis(1, at = mp[idx], labels = idx, tcl = -0.22)
+    }
   }
   if (!is.null(hline)) {
     abline(h = hline, col = hline_col, lty = 2, lwd = 1.4)
