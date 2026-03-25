@@ -13,7 +13,6 @@ plot_feature_barplot <- function(heights,
                                  hline_col = "#FF6B6B",
                                  ylim = NULL) {
   p <- length(heights)
-  # Extra left margin + mgp so ylab/title do not collide with axis ticks
   par(mar = c(4.2, 5.2, 2.4, 1), mgp = c(2.15, 0.65, 0), oma = rep(0, 4))
   if (is.null(highlight_idx)) {
     bar_col <- rep(col_signal, p)
@@ -55,6 +54,67 @@ plot_feature_barplot <- function(heights,
   }
   invisible(mp)
 }
+
+output$step1_preview <- renderUI({
+  s <- min(input$num_relevant, input$num_features)
+  p <- input$num_features
+  ratio <- round(s / p * 100, 1)
+  card(
+    class = "mb-3 border shadow-sm",
+    card_header(class = "py-2 px-3 fw-semibold small text-secondary",
+                "Feature Composition"),
+    card_body(
+      class = "py-2 px-3",
+      tags$p(
+        class = "small text-muted",
+        tags$span("Signal-to-noise ratio: "),
+        tags$code(paste0(s, " / ", p, " = ", ratio, "%"))
+      ),
+      tags$p(
+        class = "small text-muted",
+        paste0(s, " true relevant feature(s) among ", p - s, " noise features.")
+      ),
+      plotOutput("snr_pie", height = "220px")
+    )
+  )
+})
+
+output$snr_pie <- renderPlot({
+  s <- min(input$num_relevant, input$num_features)
+  p <- input$num_features
+  par(mar = c(0, 0, 0.5, 0), fg = "#888888")
+  pie(
+    c(s, p - s),
+    labels = c(paste0("Relevant (", s, ")"), paste0("Noise (", p - s, ")")),
+    col = c("#FFADAD", "#A8DADC"),
+    cex = 0.9,
+    border = "white"
+  )
+}, res = 100)
+
+output$step2_preview <- renderUI({
+  method <- input$stat_method_type
+  if (method == "ks") {
+    method_title <- "Kolmogorov-Smirnov Test"
+    method_desc  <- "Measures the maximum gap between two empirical CDFs. Good at detecting sharp, localized differences between groups."
+  } else {
+    method_title <- "Cramér-von Mises Test"
+    method_desc  <- "Measures the average squared difference between two empirical CDFs. More stable when differences are spread across the distribution."
+  }
+  card(
+    class = "mb-3 border shadow-sm",
+    card_header(class = "py-2 px-3 fw-semibold small text-secondary",
+                "Test Method"),
+    card_body(
+      class = "py-2 px-3",
+      tags$h6(tags$strong(method_title)),
+      tags$p(class = "small text-muted", method_desc),
+      tags$hr(),
+      tags$p(class = "small text-muted",
+             "In practice, both methods tend to select similar features. Try switching between them to see if results change.")
+    )
+  )
+})
 
 sim_data <- reactive({
   seed <- input$example_seed
@@ -210,23 +270,21 @@ output$selected_features_detail_table <- renderTable({
     ifelse(pred == 1 & truth == 0, "FP",
            ifelse(pred == 0 & truth == 1, "FN", "TN"))
   )
-
+  
   df <- data.frame(
-    "Feature" = seq_along(stats),
-    "Truly Relevant" = ifelse(outcome %in% c("FP", "FN"), 
-                            sprintf('<span style="color: red; font-weight: bold;">%s</span>', ifelse(truth == 1, "Yes", "No")), 
+    Feature = seq_along(stats),
+    Truly_relevant = ifelse(outcome %in% c("FP", "FN"),
+                            sprintf('<span style="color: red; font-weight: bold;">%s</span>', ifelse(truth == 1, "Yes", "No")),
                             ifelse(truth == 1, "Yes", "No")),
-    "Selected" = ifelse(outcome %in% c("FP", "FN"), 
-                      sprintf('<span style="color: red; font-weight: bold;">%s</span>', ifelse(pred == 1, "Yes", "No")), 
+    Selected = ifelse(outcome %in% c("FP", "FN"),
+                      sprintf('<span style="color: red; font-weight: bold;">%s</span>', ifelse(pred == 1, "Yes", "No")),
                       ifelse(pred == 1, "Yes", "No")),
-    "Outcome" = ifelse(outcome %in% c("FP", "FN"), 
-                     sprintf('<span style="color: red; font-weight: bold;">%s</span>', outcome), 
+    Outcome = ifelse(outcome %in% c("FP", "FN"),
+                     sprintf('<span style="color: red; font-weight: bold;">%s</span>', outcome),
                      outcome),
-    "P-value" = signif(pvals, 4),
-    "Statistic" = signif(stats, 4),
-    check.names = FALSE
+    P_value = signif(pvals, 4),
+    Statistic = signif(stats, 4)
   )
-
+  
   df[order(-pred, df$Feature), ]
 }, striped = TRUE, hover = TRUE, spacing = "xs", digits = 4, sanitize.text.function = function(x) x)
-

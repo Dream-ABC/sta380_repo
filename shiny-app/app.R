@@ -98,7 +98,17 @@ ui <- page_sidebar(
     width = 350,
     open = "always"
   ),
-
+  
+  conditionalPanel(
+    condition = "output.current_step == 'mc'",
+    uiOutput("step1_preview")
+  ),
+  
+  conditionalPanel(
+    condition = "output.current_step == 'pt'",
+    uiOutput("step2_preview")
+  ),
+  
   conditionalPanel(
     condition = "output.current_step == 'results'",
     tags$div(
@@ -150,10 +160,10 @@ ui <- page_sidebar(
 
 server <- function(input, output, session) {
   current_step <- reactiveVal("instructions")
-
+  
   output$current_step <- reactive({ current_step() })
   outputOptions(output, "current_step", suspendWhenHidden = FALSE)
-
+  
   output$step_indicator <- renderUI({
     step <- current_step()
     if (step == "instructions") {
@@ -166,7 +176,7 @@ server <- function(input, output, session) {
       tags$div(class = "alert alert-success", "Step 3/3: Results")
     }
   })
-
+  
   observeEvent(input$start_btn, {
     current_step("mc")
   })
@@ -190,7 +200,7 @@ server <- function(input, output, session) {
   observeEvent(input$reset_btn, {
     current_step("instructions")
   })
-
+  
   source(file.path("server-plots.R"), local = TRUE)
 }
 
