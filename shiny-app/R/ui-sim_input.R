@@ -1,4 +1,6 @@
 library(bslib)
+library(bsicons)
+library(shiny)
 
 sim_inputs <- div(
   conditionalPanel(
@@ -13,13 +15,19 @@ sim_inputs <- div(
     #             label = "Insert the sample size.",
     #             value = 10000),
 
-    tooltip(
-      sliderInput(inputId = "sample_size",
-                  label = "Select the sample size (n).",
-                  min = 50, max = 500, value = 200, step = 10),
-      "The total number of sample observations. A larger sample size (n) improves the accuracy of the permutation test but also increases the computation time.",
-      placement = "right"
-    ),
+    # tooltip(
+    #  sliderInput(inputId = "sample_size",
+    #              label = "Select the sample size (n).",
+    #              min = 50, max = 500, value = 200, step = 10),
+    #  "The total number of sample observations. A larger sample size (n) improves the accuracy of the permutation test but also increases the computation time.",
+    #  placement = "right"
+    #),
+
+    sliderInput(inputId = "sample_size",
+                label = tags$span("Sample Size (n) ", 
+                                  tooltip(bs_icon("info-circle", class = "ms-1 text-muted"), 
+                                          "The total number of sample observations. A larger sample size improves the accuracy of the permutation test but also increases the computation time.")),
+                min = 50, max = 500, value = 200, step = 10),
     
     # numericInput(inputId = "num_features",
     #             label = "Insert the number of features.",
