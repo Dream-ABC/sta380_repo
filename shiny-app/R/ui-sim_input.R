@@ -1,3 +1,4 @@
+library(bslib)
 
 sim_inputs <- div(
   conditionalPanel(
@@ -8,43 +9,74 @@ sim_inputs <- div(
                  label = "Insert the seed for simulation.",
                  value = 1),
 
-    #numericInput(inputId = "sample_size",
+    # numericInput(inputId = "sample_size",
     #             label = "Insert the sample size.",
     #             value = 10000),
 
-    sliderInput(inputId = "sample_size",
-                label = "Select the sample size (n).",
-                min = 50, max = 500, value = 200, step = 10),
+    tooltip(
+      sliderInput(inputId = "sample_size",
+                  label = "Select the sample size (n).",
+                  min = 50, max = 500, value = 200, step = 10),
+      "The total number of sample observations. A larger sample size (n) improves the accuracy of the permutation test but also increases the computation time.",
+      placement = "right"
+    ),
     
-    #numericInput(inputId = "num_features",
+    # numericInput(inputId = "num_features",
     #             label = "Insert the number of features.",
     #             value = 5,
     #             min = 2),
 
-    sliderInput(inputId = "num_features",
-                label = "Select the number of features (p).",
-                min = 10, max = 200, value = 100, step = 5),
+    tooltip(
+      sliderInput(inputId = "num_features",
+                  label = "Select the total number of features (p).",
+                  min = 10, max = 200, value = 100, step = 5),
+      "The total number of features (p) in the dataset, consisting of both true signals and irrelevant noise features. High-dimensional analysis focuses on cases where p is larger than n.",
+      placement = "right"
+    ),
     
-    #numericInput(inputId = "num_relevant",
+    # numericInput(inputId = "num_relevant",
     #             label = "Insert the number of true relevant features.",
     #             value = 1,
     #             min = 1),
 
-    sliderInput(inputId = "num_relevant",
-                label = "Select the number of true relevant features (s).",
-                min = 1, max = 50, value = 5, step = 1),
+    tooltip(
+      sliderInput(inputId = "num_relevant",
+                  label = "Select the number of true relevant features (s).",
+                  min = 1, max = 50, value = 5, step = 1),
+      "The number of features (s) with actual signal. The goal of feature selection is to correctly identify these true relevant features while ignoring the remaining noise features.",
+      placement = "right"
+    ),
     
-    numericInput(inputId = "num_permutations",
-                 label = "Insert the number of permutations.",
-                 value = 100,
-                 min = 1, max = 1000),
+    # numericInput(inputId = "num_permutations",
+    #             label = "Insert the number of permutations.",
+    #             value = 100,
+    #             min = 1, max = 1000),
 
-    numericInput(inputId = "alpha_level",
-                 label = "Insert the significance level.",
-                 value = 0.05,
-                 min = 0,
-                 max = 1,
-                 step = 0.01),
+    tooltip(
+      sliderInput(inputId = "num_permutations",
+                  label = "Select the number of permutations.",
+                  min = 10, max = 1000, value = 100, step = 10),
+      "The number of times that the labels are randomly shuffled to build the null distribution. A larger value improves the precision of the p-value but also increases the computation time.",
+      placement = "right"
+    ),
+
+    # numericInput(inputId = "alpha_level",
+    #             label = "Insert the significance level.",
+    #             value = 0.05,
+    #             min = 0,
+    #             max = 1,
+    #             step = 0.01),
+
+    tooltip(
+      numericInput(inputId = "alpha_level",
+                   label = "Insert the significance level.",
+                   value = 0.05,
+                   min = 0.01,
+                   max = 1,
+                   step = 0.01),
+      "The probability threshold (alpha) for identifying 'significant' features.",
+      placement = "right"
+    )
   ), # End conditionalPanel
 )
 
