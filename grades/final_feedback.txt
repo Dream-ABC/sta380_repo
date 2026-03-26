@@ -1,0 +1,35 @@
+I love the visuals and how one can restart back!
+
+However, I still think the website in its current form struggles to actually showcase the intent of your project.
+
+While there's a more detailed explanation from your sample size (n), the total number of features (p) and the number of true relevant features (s), the MAIN issue is that you haven't actually explained what you're simulating from, what the distribution of the noisy features are, and what the distribution of the "true" distribution is supposed to be.
+
+Not having this context on the website can make it confusing to any user.
+
+For someone to understand what is going on, they would need to read data_simulation.R carefully; but the goal of the website is to generally be self-contained and user friendly.
+
+Furthermore, it would be useful to actually understand the meaning of the results (which ties back to which distribution generated the "true" features and the "false" features.)
+
+If you care to actually fix this and put this on a portfolio, I would love to share this to others as the visuals are extremely nice.
+
+Not relevant to the R shiny website, but I realize on your README.md file you said:
+
+Check dependency if you are in the repo root:
+devtools::check()
+
+devtools::check() DOES NOT CHECK FOR DEPENDENCIES. IT checks for whether the package can properly be submitted to CRAN.
+
+
+Grade
+Completion (-10%), missing key context to understand the actual purpose of the R shiny website (i.e., where the data is generated from.)
+
+Group grade: 
+
+> 70/80
+[1] 0.875
+> 70/80 * 6.4
+[1] 5.6
+
+Individual grades are private and will be released later when posted on Quercus. Bonus marks, if applicable, are reflected on Quercus instead of feedback here.
+
+
